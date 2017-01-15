@@ -1,0 +1,6 @@
+---
+
+- name: Install cbsd
+  pkgng:
+    name: cbsd
+    state: present

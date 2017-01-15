@@ -1,0 +1,6 @@
+---
+
+- name: Restart cbsd
+  service:
+    name: cbsd
+    state: restarted

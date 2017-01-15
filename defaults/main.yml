@@ -1,0 +1,8 @@
+cbsd_user: cbsd
+cbsd_group: cbsd
+cbsd_log_dir: /var/log/cbsd
+cbsd_db_dir: "{{ __cbsd_db_dir }}"
+cbsd_service: cbsd
+cbsd_conf_dir: "{{ __cbsd_conf_dir }}"
+cbsd_conf_file: "{{ __cbsd_conf_dir }}/cbsd.conf"
+cbsd_flags: ""

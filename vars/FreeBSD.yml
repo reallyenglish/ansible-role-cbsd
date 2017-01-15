@@ -1,0 +1,2 @@
+__cbsd_db_dir: /var/db/cbsd
+__cbsd_conf_dir: /usr/local/etc/cbsd
