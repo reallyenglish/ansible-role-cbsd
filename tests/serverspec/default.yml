@@ -1,5 +1,7 @@
 - hosts: localhost
   pre_tasks:
+    # these tasks are necessary because cbsd refuses to run when hostname and
+    # FQDN are same, which is the case in the test environment
     - command: hostname -s
       register: register_hostname
       changed_when: false
