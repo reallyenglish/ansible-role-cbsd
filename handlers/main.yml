@@ -2,5 +2,5 @@
 
 - name: Restart cbsd
   service:
-    name: cbsd
+    name: "{{ cbsd_service }}"
     state: restarted

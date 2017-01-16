@@ -1,54 +1,40 @@
-require 'spec_helper'
-require 'serverspec'
+require "spec_helper"
 
-package = 'cbsd'
-service = 'cbsd'
-config  = '/etc/cbsd/cbsd.conf'
-user    = 'cbsd'
-group   = 'cbsd'
-ports   = [ PORTS ]
-log_dir = '/var/log/cbsd'
-db_dir  = '/var/lib/cbsd'
-
-case os[:family]
-when 'freebsd'
-  config = '/usr/local/etc/cbsd.conf'
-  db_dir = '/var/db/cbsd'
-end
+package = "cbsd"
+service = "cbsdd"
+config = "/usr/local/etc/cbsd.conf"
+user    = "cbsd"
+group   = "cbsd"
+ports   = []
+workdir = "/usr/local/jails"
 
 describe package(package) do
   it { should be_installed }
 end 
 
-describe file(config) do
+describe file("/etc/rc.conf.d/cbsdd") do
   it { should be_file }
-  its(:content) { should match Regexp.escape('cbsd') }
+  it { should be_mode 644 }
+  its(:content) { should match(/^cbsd_workdir="#{ Regexp.escape(workdir) }"$/) }
 end
 
-describe file(log_dir) do
-  it { should exist }
+describe file(workdir) do
+  it { should be_directory }
   it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
 end
 
-describe file(db_dir) do
-  it { should exist }
-  it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
-end
-
-case os[:family]
-when 'freebsd'
-  describe file('/etc/rc.conf.d/cbsd') do
-    it { should be_file }
-  end
+describe file("#{ workdir }/nodename") do
+  it { should be_file }
+  it { should be_mode 644 }
+  its(:content) { should match(/^#{ Regexp.escape("default-freebsd-103-amd64.localhost") }$/) }
 end
 
 describe service(service) do
-  it { should be_running }
   it { should be_enabled }
+end
+
+describe service("/usr/local/bin/cbsd") do
+  it { should be_running }
 end
 
 ports.each do |p|

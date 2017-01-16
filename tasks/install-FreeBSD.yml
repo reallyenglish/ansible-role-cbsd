@@ -4,3 +4,4 @@
   pkgng:
     name: cbsd
     state: present
+  register: register_cbsd_package_install

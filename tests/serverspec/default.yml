@@ -1,5 +1,14 @@
 - hosts: localhost
+  pre_tasks:
+    - command: hostname -s
+      register: register_hostname
+      changed_when: false
+    - command: hostname "{{ ansible_hostname }}.localhost"
+      when: register_hostname.stdout_lines[0] != "{{ ansible_hostname }}.localhost"
+      changed_when: false
+
   roles:
     - ansible-role-cbsd
   vars:
     cbsd_config: ""
+    cbsd_nodename: "{{ ansible_hostname }}.localhost"

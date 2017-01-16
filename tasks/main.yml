@@ -5,30 +5,39 @@
 
 - include: "install-{{ ansible_os_family }}.yml"
 
-- name: Create log directory
-  file:
-    path: "{{ cbsd_log_dir }}"
-    mode: 0755
-    owner: "{{ cbsd_user }}"
-    group: "{{ cbsd_group }}"
-    state: directory
-  notify: Restart cbsd
-
-- name: Create db directory
-  file:
-    path: "{{ cbsd_db_dir }}"
-    mode: 0755
-    owner: "{{ cbsd_user }}"
-    group: "{{ cbsd_group }}"
-    state: directory
-  notify: Restart cbsd
-
-- name: Create cbsd.conf
+- name: Create rc.conf.d/cbsdd
   template:
-    src: cbsd.conf.j2
-    dest: "{{ cbsd_conf_file }}"
-    validate: echo %s
+    src: rc.cbsdd.j2
+    dest: "/etc/rc.conf.d/{{ cbsd_service }}"
+    validate: sh -n %s
+
+- name: Create cbsd_workdir
+  file:
+    path: "{{ cbsd_workdir }}"
+    state: directory
+
+- name: Set nodename
+  template:
+    src: nodename.j2
+    dest: "{{ cbsd_workdir }}/nodename"
+  register: register_cbsd_nodename
+
+- name: See if cbsd.conf exist
+  stat:
+    path: "{{ cbsd_workdir }}/cbsd.conf"
+  register: register_cbsd_conf_stat
+
+- name: Run initenv in non-interactive mode
+  command: "{{ cbsd_home }}/sudoexec/initenv inter=0"
+  environment:
+    workdir: "{{ cbsd_workdir }}"
+  when: register_cbsd_package_install.changed or register_cbsd_nodename.changed or not register_cbsd_conf_stat.stat.exists
   notify: Restart cbsd
+
+- name: Enable cbsd
+  service:
+    name: "{{ cbsd_service }}"
+    enabled: yes
 
 - name: Start cbsd
   service:
