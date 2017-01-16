@@ -3,9 +3,6 @@ require "spec_helper"
 package = "cbsd"
 service = "cbsdd"
 config = "/usr/local/etc/cbsd.conf"
-user    = "cbsd"
-group   = "cbsd"
-ports   = []
 workdir = "/usr/local/jails"
 
 describe package(package) do
@@ -37,8 +34,14 @@ describe service("/usr/local/bin/cbsd") do
   it { should be_running }
 end
 
-ports.each do |p|
-  describe port(p) do
-    it { should be_listening }
-  end
+describe command("env NOCOLOR=1 workdir='#{ workdir }' cbsd jls") do
+  its(:exit_status) { should eq 0 }
+  its(:stderr) { should match(/^$/) }
+  its(:stdout) { should match(/^JNAME  JID  IP4_ADDR  HOST_HOSTNAME  PATH  STATUS$/) }
+end
+
+describe command("env NOCOLOR=1 workdir='#{ workdir }' cbsd -c 'cbsdsql local \"SELECT 1\"'") do
+  its(:exit_status) { should eq 0 }
+  its(:stderr) { should match(/^$/) }
+  its(:stdout) { should match(/^1$/) }
 end
