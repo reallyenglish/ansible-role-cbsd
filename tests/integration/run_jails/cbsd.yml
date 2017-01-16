@@ -1,0 +1,70 @@
+---
+- hosts: cbsd
+  become: yes
+  become_method: sudo
+  environment:
+    http_proxy: "{{ http_proxy | default() }}"
+    https_proxy: "{{ https_proxy | default() }}"
+    no_proxy: "{{ no_proxy | default() }}"
+
+  pre_tasks:
+    - name: Crete jconf
+      lineinfile:
+        dest: /usr/local/etc/foo.jconf
+        regexp: '^'
+        line: |
+          # cbsd jconfig jname=foo
+          relative_path="1";
+          jname="foo";
+          path="/usr/local/jails/jails/foo";
+          host_hostname="foo.my.domain";
+          ip4_addr="DHCP";
+          mount_devfs="1";
+          allow_mount="1";
+          allow_devfs="1";
+          allow_nullfs="1";
+          mount_fstab="/usr/local/jails/jails-fstab/fstab.foo";
+          arch="amd64";
+          mkhostsfile="1";
+          devfs_ruleset="4";
+          ver="10.3";
+          basename="";
+          baserw="0";
+          mount_src="0";
+          mount_obj="0";
+          mount_kernel="0";
+          mount_ports="0";
+          astart="1";
+          data="/usr/local/jails/jails-data/foo-data";
+          vnet="0";
+          applytpl="1";
+          mdsize="0";
+          rcconf="/usr/local/jails/jails-rcconf/rc.conf_foo";
+          floatresolv="1";
+          zfs_snapsrc="";
+
+          exec_poststart="0";
+          exec_poststop="";
+          exec_prestart="0";
+          exec_prestop="0";
+
+          exec_master_poststart="0";
+          exec_master_poststop="0";
+          exec_master_prestart="0";
+          exec_master_prestop="0";
+          pkg_bootstrap="1";
+          with_img_helpers="";
+          runasap="0";
+          interface="auto";
+          jailskeldir="/usr/local/jails/share/FreeBSD-jail-skel";
+          jail_profile="default";
+          # root password
+          user_pw_root_crypt='$6$xajcVC6Pns7EdZSQ$o2IG/.hDJs9J8RpRtiv3VImwQn5bdZUo8ryxK5JhKBxm75IT/3lmdmqR9WTavvDJk9tNPJlH6bb.OUw50Wnre1';
+          exec_start="/bin/sh /etc/rc"
+          exec_stop="/bin/sh /etc/rc.shutdown"
+          emulator="jail"
+        state: present
+        create: yes
+
+  roles:
+    - ansible-role-cbsd
