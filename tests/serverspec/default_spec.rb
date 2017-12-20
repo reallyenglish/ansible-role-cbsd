@@ -30,7 +30,7 @@ describe service(service) do
   it { should be_enabled }
 end
 
-describe service("/usr/local/bin/cbsd") do
+describe service("cbsd") do
   it { should be_running }
 end
 
